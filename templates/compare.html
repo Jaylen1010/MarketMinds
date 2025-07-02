@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<title>Stock Comparison</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header {
+        background-color: #2c3e50;
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 2.5rem;
+    }
+
+    .container {
+        width: 80%;
+        margin: 30px auto;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 20px;
+        flex: 1; /* Make sure content can grow and push footer down */
+    }
+
+    .form-container {
+        margin-bottom: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .form-container input[type="text"],
+    .form-container select {
+        padding: 10px;
+        font-size: 1rem;
+        width: 250px;
+        margin-bottom: 15px;
+        border: 2px solid #3498db;
+        border-radius: 4px;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+
+    .form-container input[type="text"]:focus,
+    .form-container select:focus {
+        border-color: #2980b9;
+    }
+
+    .form-container input[type="submit"] {
+        padding: 10px 20px;
+        font-size: 1rem;
+        color: #fff;
+        background-color: #3498db;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .form-container input[type="submit"]:hover {
+        background-color: #2980b9;
+    }
+
+    .info-box {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .info-box div {
+        background-color: #ecf0f1;
+        padding: 15px;
+        border-radius: 5px;
+        width: 30%;
+        text-align: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-box div h3 {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+    .plot-container {
+        max-width: 100%;
+        width: 900px;           /* max width for the graph */
+        margin: 30px auto 0 auto;
+        overflow-x: auto;       /* horizontal scroll if needed */
+        overflow-y: hidden;     /* hide vertical scroll */
+        height: 600px;          /* fixed height to keep consistent */
+        box-sizing: border-box;
+        border: 1px solid #ddd;
+        padding: 10px;
+        background: white;
+        border-radius: 8px;
+    }
+
+    /* Make sure iframe/svg inside plot respects container */
+    .plot-container > div, 
+    .plot-container iframe,
+    .plot-container svg {
+        max-width: 100% !important;
+        height: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* Responsive on smaller screens */
+    @media (max-width: 960px) {
+        .plot-container {
+            width: 95%;
+            height: 400px;
+            padding: 5px;
+        }
+    }
+
+    footer {
+        text-align: center;
+        padding: 20px;
+        background-color: #2c3e50;
+        color: white;
+        width: 100%;
+        margin-top: auto; /* Ensure footer is pushed to the bottom */
+    }
+    header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+header button {
+    background-color: #3498db;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+header button:hover {
+    background-color: #2980b9;
+}
+.form-container input[type="text"],
+        .form-container input[type="date"],
+        .form-container select {
+            padding: 10px;
+            font-size: 1rem;
+            width: 250px;
+            margin-bottom: 15px;
+            border: 2px solid #3498db;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-container input[type="text"]:focus,
+        .form-container input[type="date"]:focus,
+        .form-container select:focus {
+            border-color: #2980b9;
+        }
+        .nav-buttons {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.logout-btn {
+  background-color: #e74c3c;
+}
+
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .nav-buttons {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .nav-buttons button {
+    width: auto;
+  }
+}
+
+</style>
+</head>
+<body>
+    <header>
+        <h1>MarketMinds</h1>
+        <div class="nav-buttons">
+          <button onclick="window.location.href='/'">Home</button>
+          <button onclick="window.location.href='/whatif'">ROI</button>
+          <button onclick="window.location.href='/myportfolio'">Portfolio</button>
+          <button onclick="window.location.href='/account'">Account</button>
+          
+          <button onclick="window.location.href='/logout'" class="logout-btn">Logout</button>
+        </div>
+      </header>
+
+    <div class="container">
+        <!-- Form Section -->
+        <div class="form-container">
+            <form method="POST" action="/compare">
+
+                <input type="text" name="ticker1" placeholder="Enter Ticker 1 (e.g., TSLA)" required>
+                <input type="text" name="ticker2" placeholder="Enter Ticker 2 (e.g., AAPL)" required>
+                <br>
+                <label for="start">Start Date:</label>
+                <input type="date" id="start" name="start_date" required>
+
+                <label for="end">End Date:</label>
+                <input type="date" id="end" name="end_date" required>
+
+                <input type="submit" value="Submit">
+
+
+            </form>
+        </div>
+
+        <div class="plot-container">
+            {{ plot_html|safe }}
+        </div>
+        <div class="plot-container">
+            {{ sec_html|safe }}
+        </div>
+        <h2 style="color: red;">{{error}}</h2>
+
+        <!-- <div id="rsi-plot">
+            {{ rsi_data|safe }} 
+        </div> -->
+    </div>
+
+    <footer>
+        <p>MarketMinds © 2025</p>
+        <p>Copyright Application Pending Jaylen Hampton © 2025</p>
+    </footer>
+</body>
+</html>
